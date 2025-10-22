@@ -117,7 +117,7 @@ install_brave() {
 
     sudo apt update
 
-    sudo apt install brave-browser
+    sudo apt install -y brave-browser
 }
 
 # Setup thinkfan
