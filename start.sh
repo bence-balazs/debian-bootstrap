@@ -254,11 +254,29 @@ install_packages() {
     sudo apt clean
 }
 
+remove_unwanted_dirs() {
+    rm -rf /home/"${LOCAL_USERNAME}"/Public /home/"${LOCAL_USERNAME}"/Templates /home/"${LOCAL_USERNAME}"/Videos /home/"${LOCAL_USERNAME}"/Music /home/"${LOCAL_USERNAME}"/Desktop
+    cat > /home/"${LOCAL_USERNAME}"/.config/user-dirs.dirs << 'EOF'
+# XDG_DESKTOP_DIR="$HOME/Desktop"
+XDG_DOWNLOAD_DIR="$HOME/Downloads"
+# XDG_TEMPLATES_DIR="$HOME/Templates"
+# XDG_PUBLICSHARE_DIR="$HOME/Public"
+XDG_DOCUMENTS_DIR="$HOME/Documents"
+# XDG_MUSIC_DIR="$HOME/Music"
+XDG_PICTURES_DIR="$HOME/Pictures"
+# XDG_VIDEOS_DIR="$HOME/Videos"
+EOF
+
+    echo "enabled=False" > /home/"${LOCAL_USERNAME}"/.config/user-dirs.conf
+    gsettings reset org.gnome.shell favorite-apps
+}
+
 echo -n "Enter username to add groups(docker,kvm,libvirt): "
 read -r LOCAL_USERNAME
 
 relink_sh
 update_upgrade
+remove_unwanted_dirs
 remove_bloat
 install_packages
 install_brave
