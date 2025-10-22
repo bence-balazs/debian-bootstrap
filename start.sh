@@ -108,18 +108,6 @@ setup_virt() {
     sudo adduser ${LOCAL_USERNAME} kvm
 }
 
-install_brave() {
-    sudo apt install curl
-
-    sudo curl -fsSLo /usr/share/keyrings/brave-browser-archive-keyring.gpg https://brave-browser-apt-release.s3.brave.com/brave-browser-archive-keyring.gpg
-
-    sudo curl -fsSLo /etc/apt/sources.list.d/brave-browser-release.sources https://brave-browser-apt-release.s3.brave.com/brave-browser.sources
-
-    sudo apt update
-
-    sudo apt install -y brave-browser
-}
-
 # Setup thinkfan
 setup_thinkfan() {
     sudo tee /etc/thinkfan.conf > /dev/null << 'EOF'
@@ -279,7 +267,6 @@ update_upgrade
 remove_unwanted_dirs
 remove_bloat
 install_packages
-install_brave
 setup_vscode
 setup_terraform
 setup_docker
