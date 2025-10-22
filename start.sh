@@ -275,6 +275,6 @@ install_kubectl
 setup_golang
 setup_virt
 install_bssh
-setup_thinkfan
+# setup_thinkfan
 setup_sudoers
 systemctl reboot
