@@ -27,9 +27,9 @@ setup_vscode() {
     install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
     echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
     rm -f packages.microsoft.gpg
-    apt install apt-transport-https
+    apt install -y apt-transport-https
     apt update
-    apt install code # or code-insiders
+    apt install -y code # or code-insiders
 }
 
 # setup terraform
@@ -124,6 +124,7 @@ remove_bloat() {
         gnome-sound-recorder
         gnome-terminal
         gnome-tour
+        gnome-weather
         cheese
         evolution
         rhythmbox
@@ -167,6 +168,7 @@ install_packages() {
         vim
         git
         git-lfs
+        curl
         htop
         bash-completion
         bat
@@ -205,6 +207,9 @@ install_packages() {
         gnome-shell-extension-manager
         lazygit
         wireguard
+        yaru-theme-gnome-shell
+        yaru-theme-gtk
+        yaru-theme-icon
     )
 
     # Install them
