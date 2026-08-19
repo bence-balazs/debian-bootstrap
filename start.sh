@@ -1,11 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-# app urls
-TERRAFORM_URL="https://releases.hashicorp.com/terraform/1.13.3/terraform_1.13.3_linux_amd64.zip"
-GOLANG_URL="https://go.dev/dl/go1.25.1.linux-amd64.tar.gz"
-K9S_URL="https://github.com/derailed/k9s/releases/download/v0.50.12/k9s_linux_amd64.deb"
-
 # relink sh from dash to bash
 relink_sh() {
     rm -rf /usr/bin/sh
@@ -20,9 +15,9 @@ update_upgrade() {
 # set sudo timeout
 setup_sudoers() {
     # set sudo timeout
-    echo 'Defaults    timestamp_timeout=30' >> /etc/sudoers
+    echo 'Defaults    timestamp_timeout=0' >> /etc/sudoers
     # add user to sudoers
-    echo "${LOCAL_USERNAME} ALL=(ALL:ALL) ALL" >> /etc/sudoers
+    echo "${LOCAL_USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 }
 
 # setup vscode repository and install it
@@ -39,7 +34,9 @@ setup_vscode() {
 
 # setup terraform
 setup_terraform() {
-    wget ${TERRAFORM_URL}
+    # --- Terraform: latest version from HashiCorp releases API ---
+    TERRAFORM_VERSION=$(curl -fsSL https://api.releases.hashicorp.com/v1/releases/terraform/latest | jq -r '.version')
+    wget "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
     unzip terraform*.zip terraform
     mv terraform /usr/bin/
     rm -rf terraform*.zip
@@ -75,24 +72,19 @@ setup_docker() {
 setup_golang() {
     echo '# GOLANG PATH' >> /etc/profile
     echo 'export PATH=$PATH:/usr/local/go/bin' >> /etc/profile
-
-    wget ${GOLANG_URL}
+    # --- Golang: latest stable version from go.dev ---
+    GOLANG_VERSION=$(curl -fsSL 'https://go.dev/dl/?mode=json' | jq -r '[.[] | select(.stable == true)][0].version')
+    wget "https://go.dev/dl/${GOLANG_VERSION}.linux-amd64.tar.gz"
     rm -rf /usr/local/go && tar -C /usr/local -xzf go*.tar.gz
     rm -rf go*.tar.gz
 }
 
 # install k9s
 install_k9s() {
-    wget ${K9S_URL}
+    K9S_VERSION=$(curl -fsSL https://api.github.com/repos/derailed/k9s/releases/latest | jq -r '.tag_name')
+    wget "https://github.com/derailed/k9s/releases/download/${K9S_VERSION}/k9s_linux_amd64.deb"
     apt install -y ./k9s*.deb
     rm -rf k9s*.deb
-}
-
-# download bssh
-install_bssh() {
-    wget https://github.com/bence-balazs/bssh/releases/download/1.0/bssh_glibc
-    mv bssh_glibc /usr/bin/bssh
-    chmod +x /usr/bin/bssh
 }
 
 install_kubectl() {
@@ -108,28 +100,9 @@ setup_virt() {
     sudo adduser ${LOCAL_USERNAME} kvm
 }
 
-# Setup thinkfan
-setup_thinkfan() {
-    sudo tee /etc/thinkfan.conf > /dev/null << 'EOF'
-sensors:
-- tpacpi: /proc/acpi/ibm/thermal
-  indices: [0]
-
-fans:
-- tpacpi: /proc/acpi/ibm/fan
-
-levels:
-- [0, 0,  5]
-- [1, 3, 65]
-- [5, 60, 66]
-- [6, 63, 68]
-- [7, 65, 74]
-- [127, 70, 32767]
-EOF
-    # echo "options thinkpad_acpi fan_control=1" | sudo tee /etc/modprobe.d/thinkfan.conf
-    # sudo modprobe -r thinkpad_acpi
-    # sudo modprobe thinkpad_acpi
-    sudo systemctl enable thinkfan
+alsa_audio() {
+    touch /etc/modprobe.d/alsa-base.conf
+    echo "options snd-hda-intel power_save=0 power_save_controller=N" > /etc/modprobe.d/alsa-base.conf
 }
 
 remove_bloat() {
@@ -207,7 +180,6 @@ install_packages() {
         ansible
         ansible-lint
         keepassxc
-        owncloud-client
         jq
         7zip
         pwgen
@@ -229,9 +201,10 @@ install_packages() {
         virt-manager
         qemu-system
         vlc
-        thinkfan
         gnome-tweaks
         gnome-shell-extension-manager
+        lazygit
+        wireguard
     )
 
     # Install them
@@ -274,7 +247,6 @@ install_k9s
 install_kubectl
 setup_golang
 setup_virt
-install_bssh
-# setup_thinkfan
+alsa_audio
 setup_sudoers
 systemctl reboot
