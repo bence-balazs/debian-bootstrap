@@ -207,9 +207,6 @@ install_packages() {
         gnome-shell-extension-manager
         lazygit
         wireguard
-        yaru-theme-gnome-shell
-        yaru-theme-gtk
-        yaru-theme-icon
     )
 
     # Install them
