@@ -22,7 +22,6 @@ setup_sudoers() {
 
 # setup vscode repository and install it
 setup_vscode() {
-    apt-get install wget gpg
     wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
     install -D -o root -g root -m 644 packages.microsoft.gpg /etc/apt/keyrings/packages.microsoft.gpg
     echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/keyrings/packages.microsoft.gpg] https://packages.microsoft.com/repos/code stable main" | sudo tee /etc/apt/sources.list.d/vscode.list > /dev/null
@@ -37,7 +36,7 @@ setup_terraform() {
     # --- Terraform: latest version from HashiCorp releases API ---
     TERRAFORM_VERSION=$(curl -fsSL https://api.releases.hashicorp.com/v1/releases/terraform/latest | jq -r '.version')
     wget "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip"
-    unzip terraform*.zip terraform
+    unzip -o terraform*.zip terraform
     mv terraform /usr/bin/
     rm -rf terraform*.zip
 }
@@ -46,7 +45,6 @@ setup_terraform() {
 setup_docker() {
     # Add Docker's official GPG key:
     sudo apt-get update
-    sudo apt-get install ca-certificates curl
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/debian/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -111,7 +109,7 @@ remove_bloat() {
 
     # Remove common bloatware apps
     REMOVE_PACKAGES=(
-        libreoffice*
+        "libreoffice*"
         gnome-contacts
         gnome-maps
         gnome-music
@@ -164,6 +162,8 @@ install_packages() {
         fastfetch
         xfce4-terminal
         unzip
+        wget
+        gpg
         p7zip-full
         vim
         git
@@ -187,7 +187,6 @@ install_packages() {
         pwgen
         tmux
         tree
-        unzip
         age
         fonts-dejavu
         fonts-dejavu-core
@@ -207,6 +206,8 @@ install_packages() {
         gnome-shell-extension-manager
         lazygit
         wireguard
+        gnote
+        gnome-screenshot
     )
 
     # Install them
