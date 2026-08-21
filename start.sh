@@ -141,6 +141,11 @@ remove_bloat() {
         quadrapassel
         swell-foop
         tali
+        gnome-user-docs
+        gnome-boxes
+        malcontent
+        gnome-online-accounts
+        speech-dispatcher
     )
 
     # Remove them
