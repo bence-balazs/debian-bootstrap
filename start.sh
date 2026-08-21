@@ -214,6 +214,7 @@ install_packages() {
         gnote
         gnome-screenshot
         xclip
+        tlp
     )
 
     # Install them
