@@ -213,6 +213,7 @@ install_packages() {
         wireguard
         gnote
         gnome-screenshot
+        xclip
     )
 
     # Install them
